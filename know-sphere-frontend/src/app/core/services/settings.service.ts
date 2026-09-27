@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap, catchError } from 'rxjs';
+import { Observable, map, tap, catchError, throwError, of } from 'rxjs';
 import { AppSettings } from '../models/settings.model';
 import { environment } from '../../../environments/environment';
 import { ToastService } from './toast.service';
@@ -15,20 +15,48 @@ export class SettingsService {
   readonly settings = this._settings.asReadonly();
 
   getSettings(): Observable<AppSettings> {
-    // /api/settings not yet implemented on backend – return defaults
-    // When ready: return this.http.get<AppSettings>(this.base).pipe(tap(s => this._settings.set(s)));
-    return of(DEFAULT_SETTINGS).pipe(tap(s => this._settings.set(s)));
+    return this.http
+      .get<{ success: boolean; settings: AppSettings }>(this.base)
+      .pipe(
+        tap(res => {
+          if (res?.settings) {
+            this._settings.set({ ...DEFAULT_SETTINGS, ...res.settings });
+          }
+        }),
+        // Return the inner settings object, not the wrapper
+        map(res => ({ ...DEFAULT_SETTINGS, ...(res?.settings ?? {}) })),
+        catchError(() => of(DEFAULT_SETTINGS))
+      );
   }
 
-  saveSettings(settings: AppSettings): Observable<void> {
-    this._settings.set(settings);
-    // When backend ready: return this.http.put<void>(this.base, settings).pipe(tap(() => this.toast.success('Settings saved')));
-    this.toast.success('Settings saved successfully');
-    return of(undefined);
+  saveSettings(settings: AppSettings): Observable<{ success: boolean; message: string }> {
+    const safe = JSON.parse(JSON.stringify(settings));
+    if (safe.ai) { delete safe.ai.apiKey; }
+    if (safe.vectorDB) { delete safe.vectorDB.apiKey; }
+
+    return this.http
+      .put<{ success: boolean; settings: AppSettings; message: string }>(this.base, safe)
+      .pipe(
+        tap(res => {
+          if (res?.settings) {
+            this._settings.set({ ...DEFAULT_SETTINGS, ...res.settings });
+          }
+          this.toast.success(res.message ?? 'Settings saved successfully');
+        }),
+        map(res => ({ success: res.success, message: res.message })),
+        catchError(err => {
+          this.toast.error(err?.error?.message ?? 'Failed to save settings');
+          return throwError(() => err);
+        })
+      );
   }
+
+  /** Get current AI provider – used by chat to show active model */
+  get currentAIProvider(): string { return this._settings().ai.provider; }
+  get currentAIModel(): string { return this._settings().ai.model; }
 }
 
-const DEFAULT_SETTINGS: AppSettings = {
+export const DEFAULT_SETTINGS: AppSettings = {
   appName: 'KnowSphere',
   timezone: 'Asia/Kolkata',
   language: 'en',

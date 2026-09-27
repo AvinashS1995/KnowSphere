@@ -116,22 +116,28 @@ import { LoadingStateComponent } from '../../shared/components/loading-state/loa
                     <td class="px-4 py-3 text-sm text-slate-500 hidden lg:table-cell">{{ doc.uploadedBy }}</td>
                     <td class="px-4 py-3 text-sm text-slate-500 hidden md:table-cell">{{ doc.uploadedAt }}</td>
                     <td class="px-4 py-3">
-                      <div class="flex items-center justify-end gap-1">
+                      <div class="flex items-center justify-end gap-0.5">
                         <a [routerLink]="['/documents', doc.id]">
-                          <button mat-icon-button matTooltip="View" class="!w-7 !h-7 !text-slate-400 hover:!text-indigo-600">
-                            <mat-icon class="!text-base">visibility</mat-icon>
+                          <button class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" matTooltip="View document">
+                            <mat-icon class="!text-[16px]">visibility</mat-icon>
                           </button>
                         </a>
-                        <button mat-icon-button matTooltip="Download" class="!w-7 !h-7 !text-slate-400 hover:!text-indigo-600">
-                          <mat-icon class="!text-base">download</mat-icon>
+                        <button (click)="downloadDoc(doc)"
+                          class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" matTooltip="Download">
+                          <mat-icon class="!text-[16px]">download</mat-icon>
                         </button>
-                        <button mat-icon-button matTooltip="{{ doc.isFavorite ? 'Unfavorite' : 'Favorite' }}"
-                          class="!w-7 !h-7" [class.!text-yellow-500]="doc.isFavorite" [class.!text-slate-400]="!doc.isFavorite"
-                          (click)="toggleFav(doc.id)">
-                          <mat-icon class="!text-base">{{ doc.isFavorite ? 'star' : 'star_border' }}</mat-icon>
+                        <button (click)="toggleFav(doc.id)"
+                          class="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                          [class.text-yellow-500]="doc.isFavorite"
+                          [class.text-slate-400]="!doc.isFavorite"
+                          [class.hover:bg-yellow-50]="!doc.isFavorite"
+                          [class.hover:text-yellow-600]="!doc.isFavorite"
+                          [matTooltip]="doc.isFavorite ? 'Unfavorite' : 'Favorite'">
+                          <mat-icon class="!text-[16px]">{{ doc.isFavorite ? 'star' : 'star_border' }}</mat-icon>
                         </button>
-                        <button mat-icon-button [matMenuTriggerFor]="docMenu" class="!w-7 !h-7 !text-slate-400">
-                          <mat-icon class="!text-base">more_vert</mat-icon>
+                        <button [matMenuTriggerFor]="docMenu"
+                          class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                          <mat-icon class="!text-[16px]">more_vert</mat-icon>
                         </button>
                         <mat-menu #docMenu="matMenu">
                           <button mat-menu-item (click)="archiveDoc(doc.id)">
@@ -194,6 +200,23 @@ export class DocumentsComponent implements OnInit {
   toggleFav(id: string) { this.docService.toggleFavorite(id); }
   archiveDoc(id: string) { this.docService.archiveDocument(id); }
   deleteDoc(id: string) { this.docService.deleteDocument(id); }
+
+  downloadDoc(doc: any): void {
+    // Use presigned S3 URL if available, otherwise fetch from API
+    this.docService.getDocument(doc.id).subscribe({
+      next: fullDoc => {
+        const url = (fullDoc as any).s3Url || (fullDoc as any).signedUrl;
+        if (url) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fullDoc.name;
+          a.target = '_blank';
+          a.click();
+        }
+      },
+      error: () => {}
+    });
+  }
 
   getDocIcon(type: string): string {
     if (type === 'PDF') return 'picture_as_pdf';

@@ -30,6 +30,14 @@ export interface DepartmentUsage {
   percentage: number;
 }
 
+export interface UserUsage {
+  userId: string;
+  name: string;
+  email: string;
+  department: string;
+  queries: number;
+}
+
 export interface AnalyticsSummary {
   totalQueries: number;
   uniqueUsers: number;
@@ -39,4 +47,5 @@ export interface AnalyticsSummary {
   topDocumentsList: TopDocument[];
   topQueries: TopQuery[];
   departmentUsage: DepartmentUsage[];
+  userUsage?: UserUsage[];
 }

@@ -14,6 +14,7 @@ import documentRoutes from './routes/document.routes';
 import chatRoutes from './routes/chat.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import userRoutes from './routes/user.routes';
+import settingsRoutes from './routes/settings.routes';
 
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 
@@ -50,6 +51,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // ── Error handling ────────────────────────────────────
 app.use(notFoundHandler);

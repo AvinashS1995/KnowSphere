@@ -145,7 +145,7 @@ import { UploadProgress } from '../../../core/models/document.model';
                       [class.bg-white]="i > currentStep()"
                       [class.border-slate-200]="i > currentStep()">
                       @if (i < currentStep()) {
-                        <mat-icon class="!text-sm text-white">check</mat-icon>
+                        <mat-icon class="!text-sm !w-4 !h-4 text-white flex items-center justify-center">check</mat-icon>
                       } @else if (i === currentStep()) {
                         <div class="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
                       } @else {

@@ -132,6 +132,56 @@ import {
             </div>
           </div>
         </div>
+
+        <!-- Per-user usage table -->
+        @if (data()?.userUsage?.length) {
+          <div class="mt-5 bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-slate-700">User AI Usage</h3>
+              <span class="text-xs text-slate-400">Queries per user</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="text-left px-5 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
+                    <th class="text-left px-5 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Email</th>
+                    <th class="text-left px-5 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Department</th>
+                    <th class="text-left px-5 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Queries</th>
+                    <th class="px-5 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Usage</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                  @for (u of data()!.userUsage!; track u.userId) {
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="px-5 py-3">
+                        <div class="flex items-center gap-2">
+                          <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                            <span class="text-xs font-bold text-indigo-700">{{ u.name.charAt(0) }}</span>
+                          </div>
+                          <span class="text-sm font-medium text-slate-700">{{ u.name }}</span>
+                        </div>
+                      </td>
+                      <td class="px-5 py-3 text-sm text-slate-500 hidden md:table-cell">{{ u.email }}</td>
+                      <td class="px-5 py-3 hidden sm:table-cell">
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{{ u.department }}</span>
+                      </td>
+                      <td class="px-5 py-3 text-sm font-semibold text-slate-800">{{ u.queries }}</td>
+                      <td class="px-5 py-3 w-40">
+                        <div class="flex items-center gap-2">
+                          <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-500 rounded-full" [style.width.%]="getUsagePercent(u.queries)"></div>
+                          </div>
+                          <span class="text-xs text-slate-400 w-8 text-right">{{ getUsagePercent(u.queries) }}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
       }
     </div>
   `
@@ -171,6 +221,11 @@ export class AnalyticsComponent implements OnInit {
   donutColors = ['#6366f1', '#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
   donutLegend: ApexLegend = { position: 'right', fontSize: '12px' };
   donutPlotOptions: ApexPlotOptions = { pie: { donut: { size: '65%' } } };
+
+  getUsagePercent(queries: number): number {
+    const max = Math.max(...(this.data()?.userUsage?.map(u => u.queries) ?? [1]));
+    return max === 0 ? 0 : Math.round((queries / max) * 100);
+  }
 
   ngOnInit(): void {
     this.analyticsService.getSummary().subscribe({

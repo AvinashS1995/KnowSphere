@@ -2,6 +2,25 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import { ConversationModel } from '../models/conversation.model';
 import { ragQuery } from '../rag/rag.service';
+import { SettingsModel } from '../models/settings.model';
+import { config } from '../config/env';
+
+/** Load active AI settings from DB (falls back to .env defaults) */
+async function getActiveAIConfig(): Promise<{ provider: string; model: string; temperature: number; maxTokens: number }> {
+  try {
+    const settings = await SettingsModel.findOne({ workspaceId: 'default' }).lean();
+    if (settings?.ai?.provider) {
+      return {
+        provider:    settings.ai.provider,
+        model:       settings.ai.model,
+        temperature: settings.ai.temperature ?? config.ai.temperature,
+        maxTokens:   settings.ai.maxTokens   ?? config.ai.maxTokens
+      };
+    }
+  } catch {}
+  // Fallback to .env
+  return { provider: config.ai.provider, model: config.ai.model, temperature: config.ai.temperature, maxTokens: config.ai.maxTokens };
+}
 
 export const getConversations = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -37,9 +56,13 @@ export const createConversation = async (req: AuthRequest, res: Response): Promi
 export const sendMessage = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { question, conversationId, collectionId } = req.body;
+
+    // SECURITY: ignore any provider/model/apiKey from client — use DB settings
     if (!question?.trim()) { res.status(400).json({ success: false, message: 'Question is required' }); return; }
 
-    // Get or create conversation
+    // Get AI config from database (admin-controlled), not from request body
+    const aiConfig = await getActiveAIConfig();
+
     let conv = conversationId
       ? await ConversationModel.findOne({ _id: conversationId, userId: req.user!.id })
       : null;
@@ -52,16 +75,13 @@ export const sendMessage = async (req: AuthRequest, res: Response): Promise<void
       });
     }
 
-    // Add user message
     conv.messages.push({ role: 'user', content: question, createdAt: new Date() });
 
-    // RAG query
+    // RAG query uses AI config from DB
     const { answer, sources } = await ragQuery(question, collectionId);
 
-    // Add assistant response
     conv.messages.push({ role: 'assistant', content: answer, sources, createdAt: new Date() });
 
-    // Update title if first message
     if (conv.messages.length <= 2) {
       conv.title = question.slice(0, 60);
     }
@@ -72,6 +92,8 @@ export const sendMessage = async (req: AuthRequest, res: Response): Promise<void
     res.json({
       success: true,
       conversationId: conv.id,
+      aiProvider: aiConfig.provider,   // safe to return — not a secret
+      aiModel:    aiConfig.model,      // safe to return — not a secret
       message: {
         id: (lastMsg as any)._id,
         role: lastMsg.role,
