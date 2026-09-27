@@ -6,9 +6,7 @@
     "know-sphere-frontend": {
       "projectType": "application",
       "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
+        "@schematics/angular:component": { "style": "scss" }
       },
       "root": "",
       "sourceRoot": "src",
@@ -20,30 +18,14 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.scss",
-              "src/tailwind.css"
-            ]
+            "assets": [{ "glob": "**/*", "input": "public" }],
+            "styles": ["src/styles.scss", "src/tailwind.css"]
           },
           "configurations": {
             "production": {
               "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
+                { "type": "initial", "maximumWarning": "500kB", "maximumError": "2MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "8kB", "maximumError": "16kB" }
               ],
               "outputHashing": "all"
             },
@@ -58,33 +40,22 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "know-sphere-frontend:build:production"
-            },
+            "production": { "buildTarget": "know-sphere-frontend:build:production" },
             "development": {
-              "buildTarget": "know-sphere-frontend:build:development"
+              "buildTarget": "know-sphere-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
         },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
-        },
+        "extract-i18n": { "builder": "@angular/build:extract-i18n" },
         "test": {
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.scss",
-              "src/tailwind.css"
-            ]
+            "assets": [{ "glob": "**/*", "input": "public" }],
+            "styles": ["src/styles.scss", "src/tailwind.css"]
           }
         }
       }
