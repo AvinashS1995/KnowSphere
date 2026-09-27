@@ -10,17 +10,26 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+  ],
   template: `
     <div class="min-h-screen flex">
-
       <!-- Left branded panel -->
-      <div class="hidden lg:flex lg:w-5/12 bg-[#3730a3] flex-col justify-between p-10 relative overflow-hidden">
+      <div
+        class="hidden lg:flex lg:w-5/12 bg-[#3730a3] flex-col justify-between p-10 relative overflow-hidden"
+      >
         <!-- Background decoration -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full"></div>
           <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full"></div>
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/3 rounded-full"></div>
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/3 rounded-full"
+          ></div>
         </div>
 
         <div class="relative z-10">
@@ -38,18 +47,18 @@ import { AuthService } from '../../core/services/auth.service';
           <!-- Hero text -->
           <div class="mb-12">
             <h1 class="text-4xl font-bold text-white leading-tight mb-4">
-              Ask, Search and<br>Find Answers
+              Ask, Search and<br />Find Answers
             </h1>
-            <p class="text-indigo-200 text-lg leading-relaxed">
-              from your company knowledge
-            </p>
+            <p class="text-indigo-200 text-lg leading-relaxed">from your company knowledge</p>
           </div>
 
           <!-- Features -->
           <div class="space-y-4">
             @for (feature of features; track feature.text) {
               <div class="flex items-center gap-3">
-                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                <div
+                  class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0"
+                >
                   <mat-icon class="!text-sm text-white">check</mat-icon>
                 </div>
                 <span class="text-indigo-100 text-sm">{{ feature.text }}</span>
@@ -66,7 +75,6 @@ import { AuthService } from '../../core/services/auth.service';
       <!-- Right login form -->
       <div class="flex-1 flex items-center justify-center p-8 bg-white">
         <div class="w-full max-w-sm">
-
           <!-- Mobile logo -->
           <div class="flex items-center gap-2 mb-8 lg:hidden">
             <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
@@ -80,7 +88,9 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Error banner -->
           @if (errorMsg()) {
-            <div class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5">
+            <div
+              class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5"
+            >
               <mat-icon class="!text-base text-red-500 flex-shrink-0">error_outline</mat-icon>
               <span class="text-sm text-red-600">{{ errorMsg() }}</span>
             </div>
@@ -99,11 +109,16 @@ import { AuthService } from '../../core/services/auth.service';
                   type="email"
                   placeholder="you@company.com"
                   class="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  [class.border-red-300]="isInvalid('email')" />
+                  [class.border-red-300]="isInvalid('email')"
+                />
               </div>
               @if (isInvalid('email')) {
                 <p class="text-xs text-red-500 mt-1">
-                  {{ form.get('email')?.hasError('required') ? 'Email is required' : 'Enter a valid email' }}
+                  {{
+                    form.get('email')?.hasError('required')
+                      ? 'Email is required'
+                      : 'Enter a valid email'
+                  }}
                 </p>
               }
             </div>
@@ -120,12 +135,16 @@ import { AuthService } from '../../core/services/auth.service';
                   [type]="showPassword() ? 'text' : 'password'"
                   placeholder="••••••••"
                   class="w-full pl-9 pr-10 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  [class.border-red-300]="isInvalid('password')" />
+                  [class.border-red-300]="isInvalid('password')"
+                />
                 <button
                   type="button"
                   (click)="showPassword.set(!showPassword())"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  <mat-icon class="!text-base">{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <mat-icon class="!text-base">{{
+                    showPassword() ? 'visibility_off' : 'visibility'
+                  }}</mat-icon>
                 </button>
               </div>
               @if (isInvalid('password')) {
@@ -134,7 +153,10 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
 
             <div class="flex justify-end">
-              <button type="button" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+              <button
+                type="button"
+                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+              >
                 Forgot password?
               </button>
             </div>
@@ -144,7 +166,8 @@ import { AuthService } from '../../core/services/auth.service';
               mat-flat-button
               type="submit"
               [disabled]="loading()"
-              class="w-full !bg-indigo-600 hover:!bg-indigo-700 !text-white !py-6 !rounded-lg !text-sm !font-semibold">
+              class="w-full !bg-indigo-600 hover:!bg-indigo-700 !text-white !py-6 !rounded-lg !text-sm !font-semibold"
+            >
               @if (loading()) {
                 <mat-spinner diameter="18" class="mr-2 inline-block"></mat-spinner>
                 Signing in...
@@ -164,14 +187,19 @@ import { AuthService } from '../../core/services/auth.service';
           <!-- Google -->
           <button
             mat-stroked-button
-            class="w-full !border-slate-200 !text-slate-700 !py-5 !rounded-lg !text-sm !font-medium">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4 mr-2 inline">
+            class="w-full !border-slate-200 !text-slate-700 !py-5 !rounded-lg !text-sm !font-medium"
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google"
+              class="w-4 h-4 mr-2 inline"
+            />
             Sign in with Google
           </button>
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -186,12 +214,12 @@ export class LoginComponent {
     { text: 'Secure & Private' },
     { text: 'AI Powered Search' },
     { text: 'Find Answers Instantly' },
-    { text: 'Source References' }
+    { text: 'Source References' },
   ];
 
   form = this.fb.group({
     email: ['admin@company.com', [Validators.required, Validators.email]],
-    password: ['password123', [Validators.required]]
+    password: ['Admin@123', [Validators.required]],
   });
 
   isInvalid(field: string): boolean {
@@ -200,13 +228,22 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.loading.set(true);
     this.errorMsg.set('');
     const { email, password } = this.form.value;
     this.auth.login({ email: email!, password: password! }).subscribe({
-      next: () => { this.loading.set(false); this.router.navigate(['/dashboard']); },
-      error: () => { this.loading.set(false); this.errorMsg.set('Invalid email or password.'); }
+      next: () => {
+        this.loading.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.errorMsg.set('Invalid email or password.');
+      },
     });
   }
 }
